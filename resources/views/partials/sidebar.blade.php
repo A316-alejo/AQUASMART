@@ -4,7 +4,7 @@
         'Operación' => [
             ['route' => 'dashboard', 'active' => 'dashboard', 'icon' => 'dashboard', 'label' => 'Dashboard general'],
             ['route' => 'producers.index', 'active' => 'producers.*', 'icon' => 'producers', 'label' => 'Productores', 'can' => ['viewAny', App\Models\Producer::class]],
-            ['route' => 'farms.index', 'active' => 'farms.*', 'icon' => 'farm', 'label' => 'Fincas'],
+            ['route' => 'farms.index', 'active' => 'farms.*', 'icon' => 'farm', 'label' => 'Fincas', 'can' => ['viewAny', App\Models\Farm::class]],
             ['route' => 'ponds.index', 'active' => 'ponds.*', 'icon' => 'pond', 'label' => 'Gestión de estanques'],
             ['route' => 'batches.index', 'active' => 'batches.*', 'icon' => 'fish', 'label' => 'Lotes'],
             ['route' => 'devices.index', 'active' => 'devices.*', 'icon' => 'iot', 'label' => 'Centro IoT'],

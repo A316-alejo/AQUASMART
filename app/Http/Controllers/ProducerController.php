@@ -69,7 +69,7 @@ class ProducerController extends Controller
             ->with('status', "Se registró el productor {$producer->name}.");
     }
 
-    public function show(Producer $producer): View
+    public function show(Request $request, Producer $producer): View
     {
         Gate::authorize('view', $producer);
 
@@ -77,7 +77,10 @@ class ProducerController extends Controller
             $producer->load(['users' => fn ($query) => $query->orderBy('name')]);
         }
 
-        return view('producers.show', ['producer' => $producer]);
+        return view('producers.show', [
+            'producer' => $producer,
+            'farms' => $producer->farms()->visibleTo($request->user())->orderBy('name')->get(),
+        ]);
     }
 
     public function edit(Producer $producer): View

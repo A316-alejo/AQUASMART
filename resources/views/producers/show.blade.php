@@ -84,10 +84,27 @@
             @endif
 
             <div class="card">
-                <header><h3>Fincas</h3></header>
-                <p style="color:var(--ink-3);font-size:13px;margin:0">
-                    Las fincas de este productor aparecerán aquí cuando se habilite el módulo de Fincas.
-                </p>
+                <header>
+                    <h3>Fincas</h3>
+                    <span class="tag info plain">{{ $farms->count() }}</span>
+                </header>
+                @forelse ($farms as $farm)
+                    <div class="list-row">
+                        <span class="sev info" aria-hidden="true"><x-icon name="farm" style="width:18px;height:18px" /></span>
+                        <span class="body">
+                            <b>{{ $farm->name }}</b>
+                            <span>{{ $farm->municipality }}, {{ $farm->department }}{{ $farm->is_active ? '' : ' · Inactiva' }}</span>
+                        </span>
+                        <a class="btn sm" href="{{ route('farms.show', $farm) }}">Ver</a>
+                    </div>
+                @empty
+                    <p style="color:var(--ink-3);font-size:13px;margin:0">Este productor todavía no tiene fincas registradas.</p>
+                @endforelse
+                @can('create', App\Models\Farm::class)
+                    @if ($producer->is_active)
+                        <a class="btn block sm" style="margin-top:12px" href="{{ route('farms.create', ['producer' => $producer->id]) }}">Nueva finca</a>
+                    @endif
+                @endcan
             </div>
         </div>
     </div>

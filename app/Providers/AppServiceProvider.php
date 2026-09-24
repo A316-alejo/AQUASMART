@@ -30,6 +30,7 @@ class AppServiceProvider extends ServiceProvider
 
         Route::pattern('user', '[0-9]+');
         Route::pattern('producer', '[0-9]+');
+        Route::pattern('farm', '[0-9]+');
 
         $this->registerGates();
     }
@@ -42,5 +43,7 @@ class AppServiceProvider extends ServiceProvider
             && $role->level() <= $user->role->level());
 
         Gate::define('manage-producers', fn (User $user) => $user->is_active && $user->isAdmin());
+
+        Gate::define('manage-farms', fn (User $user) => $user->is_active && $user->isAdmin());
     }
 }

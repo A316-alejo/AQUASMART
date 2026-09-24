@@ -52,6 +52,14 @@ class Producer extends Model
         return $this->hasMany(User::class);
     }
 
+    /**
+     * @return HasMany<Farm, $this>
+     */
+    public function farms(): HasMany
+    {
+        return $this->hasMany(Farm::class);
+    }
+
     public function documentLabel(): string
     {
         return $this->document_type->value.' '.$this->document_number;

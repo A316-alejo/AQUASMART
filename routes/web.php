@@ -1,11 +1,15 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\FarmAssignmentController;
+use App\Http\Controllers\FarmController;
+use App\Http\Controllers\FarmStatusController;
 use App\Http\Controllers\ProducerController;
 use App\Http\Controllers\ProducerStatusController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserPasswordResetLinkController;
 use App\Http\Controllers\UserStatusController;
+use App\Models\Farm;
 use App\Models\Producer;
 use Illuminate\Support\Facades\Route;
 
@@ -44,6 +48,25 @@ Route::middleware(['auth', 'active'])->group(function () {
 
         Route::get('/', [ProducerController::class, 'index'])->middleware('can:viewAny,'.Producer::class)->name('index');
         Route::get('/{producer}', [ProducerController::class, 'show'])->middleware('can:view,producer')->name('show');
+    });
+
+    Route::prefix('fincas')->name('farms.')->group(function () {
+        Route::middleware('can:manage-farms')->group(function () {
+            Route::get('/crear', [FarmController::class, 'create'])->name('create');
+            Route::post('/', [FarmController::class, 'store'])->name('store');
+            Route::get('/{farm}/editar', [FarmController::class, 'edit'])->name('edit');
+            Route::put('/{farm}', [FarmController::class, 'update'])->name('update');
+
+            Route::get('/{farm}/desactivar', [FarmStatusController::class, 'confirmDeactivation'])->name('deactivate.confirm');
+            Route::patch('/{farm}/desactivar', [FarmStatusController::class, 'deactivate'])->name('deactivate');
+            Route::patch('/{farm}/activar', [FarmStatusController::class, 'activate'])->name('activate');
+
+            Route::post('/{farm}/asignaciones', [FarmAssignmentController::class, 'store'])->name('assignments.store');
+            Route::delete('/{farm}/asignaciones/{user}', [FarmAssignmentController::class, 'destroy'])->name('assignments.destroy');
+        });
+
+        Route::get('/', [FarmController::class, 'index'])->middleware('can:viewAny,'.Farm::class)->name('index');
+        Route::get('/{farm}', [FarmController::class, 'show'])->middleware('can:view,farm')->name('show');
     });
 });
 
