@@ -1,5 +1,5 @@
 @php
-    // Los módulos aparecen en el menú a medida que se registran sus rutas.
+    // Los módulos aparecen en el menú a medida que se registran sus rutas y según el permiso ('can') del usuario.
     $navigation = [
         'Operación' => [
             ['route' => 'dashboard', 'active' => 'dashboard', 'icon' => 'dashboard', 'label' => 'Dashboard general'],
@@ -14,7 +14,7 @@
             ['route' => 'stats', 'active' => 'stats', 'icon' => 'stats', 'label' => 'Estadísticas'],
         ],
         'Administración' => [
-            ['route' => 'users.index', 'active' => 'users.*', 'icon' => 'users', 'label' => 'Usuarios'],
+            ['route' => 'users.index', 'active' => 'users.*', 'icon' => 'users', 'label' => 'Usuarios', 'can' => 'manage-users'],
         ],
     ];
 @endphp
@@ -23,7 +23,10 @@
 
     <nav aria-label="Navegación principal">
         @foreach ($navigation as $group => $items)
-            @php $items = array_filter($items, fn ($item) => Route::has($item['route'])); @endphp
+            @php
+                $items = array_filter($items, fn ($item) => Route::has($item['route'])
+                    && (! isset($item['can']) || Gate::allows($item['can'])));
+            @endphp
             @continue(empty($items))
 
             <div class="nav-group">{{ $group }}</div>

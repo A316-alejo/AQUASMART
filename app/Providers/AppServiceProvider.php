@@ -2,7 +2,11 @@
 
 namespace App\Providers;
 
+use App\Enums\Role;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 
@@ -19,5 +23,18 @@ class AppServiceProvider extends ServiceProvider
         Model::shouldBeStrict(! $this->app->isProduction());
 
         Password::defaults(fn () => Password::min(8)->letters()->numbers());
+
+        Paginator::defaultView('partials.pagination');
+        Paginator::defaultSimpleView('partials.pagination');
+
+        $this->registerGates();
+    }
+
+    private function registerGates(): void
+    {
+        Gate::define('manage-users', fn (User $user) => $user->is_active && $user->isAdmin());
+
+        Gate::define('assign-role', fn (User $user, Role $role) => Gate::forUser($user)->allows('manage-users')
+            && $role->level() <= $user->role->level());
     }
 }

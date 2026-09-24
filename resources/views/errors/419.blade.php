@@ -1,0 +1,5 @@
+@extends('errors.layout')
+@section('title', 'Sesión expirada — AquaSmart')
+@section('code', '419')
+@section('heading', 'La página expiró')
+@section('message', 'Por seguridad, el formulario caducó. Vuelve a la página anterior, recárgala e inténtalo de nuevo.')

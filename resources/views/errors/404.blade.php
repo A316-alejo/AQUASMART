@@ -1,0 +1,5 @@
+@extends('errors.layout')
+@section('title', 'Página no encontrada — AquaSmart')
+@section('code', '404')
+@section('heading', 'Página no encontrada')
+@section('message', 'La página que buscas no existe o fue movida.')

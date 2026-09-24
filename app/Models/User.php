@@ -7,6 +7,7 @@ use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class User extends Authenticatable
@@ -54,6 +55,22 @@ class User extends Authenticatable
     public function isAdmin(): bool
     {
         return $this->role === Role::Admin;
+    }
+
+    /**
+     * Invalida el "recordarme" y borra las sesiones abiertas del usuario, salvo la indicada.
+     */
+    public function endAllSessions(?string $exceptSessionId = null): void
+    {
+        $this->forceFill(['remember_token' => Str::random(60)])->saveQuietly();
+
+        if (config('session.driver') === 'database') {
+            DB::connection(config('session.connection'))
+                ->table(config('session.table', 'sessions'))
+                ->where('user_id', $this->getKey())
+                ->when($exceptSessionId, fn ($query) => $query->where('id', '!=', $exceptSessionId))
+                ->delete();
+        }
     }
 
     public function initials(): string

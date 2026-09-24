@@ -1,0 +1,5 @@
+@extends('errors.layout')
+@section('title', 'Acceso denegado — AquaSmart')
+@section('code', '403')
+@section('heading', 'Acceso denegado')
+@section('message', 'Tu rol no tiene permiso para ver esta página o realizar esta acción. Si crees que es un error, contacta a un administrador.')
