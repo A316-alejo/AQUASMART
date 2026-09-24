@@ -6,6 +6,7 @@ use App\Models\Concerns\IsCatalogItem;
 use Database\Factories\SpeciesFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Species extends Model
 {
@@ -33,6 +34,14 @@ class Species extends Model
         return [
             'is_active' => 'boolean',
         ];
+    }
+
+    /**
+     * @return HasMany<Batch, $this>
+     */
+    public function batches(): HasMany
+    {
+        return $this->hasMany(Batch::class);
     }
 
     public function catalogLabel(): string

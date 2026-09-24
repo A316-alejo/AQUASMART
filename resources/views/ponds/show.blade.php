@@ -80,4 +80,32 @@
             <dd>{{ $pond->created_at?->format('d/m/Y H:i') }}</dd>
         </dl>
     </div>
+
+    <div class="card" style="margin-top:14px">
+        <header>
+            <h3>Lotes</h3>
+            <span class="tag info plain">{{ $pond->batches->count() }}</span>
+        </header>
+        @forelse ($pond->batches as $batch)
+            <div class="list-row">
+                <span class="sev info" aria-hidden="true"><x-icon name="fish" style="width:18px;height:18px" /></span>
+                <span class="body">
+                    <b>{{ $batch->code }} · {{ $batch->name }}</b>
+                    <span>
+                        {{ $batch->species->common_name }} · sembrado el {{ $batch->stocked_at->format('d/m/Y') }}
+                        · {{ number_format($batch->initial_quantity, 0, ',', '.') }} peces
+                    </span>
+                </span>
+                <x-batch-status :status="$batch->status" />
+                <a class="btn sm" href="{{ route('batches.show', $batch) }}">Ver</a>
+            </div>
+        @empty
+            <p style="color:var(--ink-3);font-size:13px;margin:0">Este estanque todavía no tiene lotes registrados.</p>
+        @endforelse
+        @can('create', App\Models\Batch::class)
+            @if ($pond->is_active && $pond->farm->is_active)
+                <a class="btn block sm" style="margin-top:12px" href="{{ route('batches.create', ['pond' => $pond->id]) }}">Nuevo lote</a>
+            @endif
+        @endcan
+    </div>
 @endsection

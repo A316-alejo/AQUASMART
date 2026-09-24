@@ -80,7 +80,7 @@ Orden oficial:
 4. Fincas ✔
 5. Estanques ✔
 6. Catálogos y especies ✔
-7. Lotes/ciclos de producción
+7. Lotes/ciclos de producción ✔
 8. Alimentación, mortalidad, biometría y biomasa
 9. Calidad del agua y mediciones
 10. Centro de alertas

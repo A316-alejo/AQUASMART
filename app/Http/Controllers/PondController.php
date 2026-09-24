@@ -85,7 +85,10 @@ class PondController extends Controller
     {
         Gate::authorize('view', $pond);
 
-        return view('ponds.show', ['pond' => $pond->load('farm.producer')]);
+        return view('ponds.show', ['pond' => $pond->load([
+            'farm.producer',
+            'batches' => fn ($query) => $query->with('species:id,common_name')->orderByDesc('stocked_at')->orderByDesc('id'),
+        ])]);
     }
 
     public function edit(Pond $pond): View

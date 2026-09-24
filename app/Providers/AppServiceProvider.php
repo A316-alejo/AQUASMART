@@ -36,6 +36,7 @@ class AppServiceProvider extends ServiceProvider
         Route::pattern('farm', '[0-9]+');
         Route::pattern('pond', '[0-9]+');
         Route::pattern('item', '[0-9]+');
+        Route::pattern('batch', '[0-9]+');
 
         // {item} se busca únicamente en la tabla del catálogo indicado en la URL.
         Route::bind('item', function (string $value, RoutingRoute $route) {
@@ -69,5 +70,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('manage-ponds', fn (User $user) => $user->is_active && $user->isAdmin());
 
         Gate::define('manage-catalogs', fn (User $user) => $user->is_active && $user->isAdmin());
+
+        Gate::define('manage-batches', fn (User $user) => $user->is_active && $user->isAdmin());
     }
 }

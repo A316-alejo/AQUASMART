@@ -1,6 +1,8 @@
 <?php
 
 use App\Enums\Catalog;
+use App\Http\Controllers\BatchClosureController;
+use App\Http\Controllers\BatchController;
 use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\CatalogStatusController;
 use App\Http\Controllers\DashboardController;
@@ -14,6 +16,7 @@ use App\Http\Controllers\ProducerStatusController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserPasswordResetLinkController;
 use App\Http\Controllers\UserStatusController;
+use App\Models\Batch;
 use App\Models\Farm;
 use App\Models\Pond;
 use App\Models\Producer;
@@ -89,6 +92,23 @@ Route::middleware(['auth', 'active'])->group(function () {
 
         Route::get('/', [PondController::class, 'index'])->middleware('can:viewAny,'.Pond::class)->name('index');
         Route::get('/{pond}', [PondController::class, 'show'])->middleware('can:view,pond')->name('show');
+    });
+
+    Route::prefix('lotes')->name('batches.')->group(function () {
+        Route::middleware('can:manage-batches')->group(function () {
+            Route::get('/crear', [BatchController::class, 'create'])->name('create');
+            Route::post('/', [BatchController::class, 'store'])->name('store');
+            Route::get('/{batch}/editar', [BatchController::class, 'edit'])->name('edit');
+            Route::put('/{batch}', [BatchController::class, 'update'])->name('update');
+
+            Route::get('/{batch}/cerrar', [BatchClosureController::class, 'confirmClose'])->name('close.confirm');
+            Route::patch('/{batch}/cerrar', [BatchClosureController::class, 'close'])->name('close');
+            Route::get('/{batch}/cancelar', [BatchClosureController::class, 'confirmCancel'])->name('cancel.confirm');
+            Route::patch('/{batch}/cancelar', [BatchClosureController::class, 'cancel'])->name('cancel');
+        });
+
+        Route::get('/', [BatchController::class, 'index'])->middleware('can:viewAny,'.Batch::class)->name('index');
+        Route::get('/{batch}', [BatchController::class, 'show'])->middleware('can:view,batch')->name('show');
     });
 
     Route::prefix('catalogos')->name('catalogs.')->group(function () {
