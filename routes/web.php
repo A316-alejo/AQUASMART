@@ -1,5 +1,8 @@
 <?php
 
+use App\Enums\Catalog;
+use App\Http\Controllers\CatalogController;
+use App\Http\Controllers\CatalogStatusController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FarmAssignmentController;
 use App\Http\Controllers\FarmController;
@@ -86,6 +89,23 @@ Route::middleware(['auth', 'active'])->group(function () {
 
         Route::get('/', [PondController::class, 'index'])->middleware('can:viewAny,'.Pond::class)->name('index');
         Route::get('/{pond}', [PondController::class, 'show'])->middleware('can:view,pond')->name('show');
+    });
+
+    Route::prefix('catalogos')->name('catalogs.')->group(function () {
+        Route::redirect('/', '/catalogos/'.Catalog::Species->value)->name('home');
+
+        Route::middleware('can:manage-catalogs')->group(function () {
+            Route::get('/{catalog}/crear', [CatalogController::class, 'create'])->name('create');
+            Route::post('/{catalog}', [CatalogController::class, 'store'])->name('store');
+            Route::get('/{catalog}/{item}/editar', [CatalogController::class, 'edit'])->name('edit');
+            Route::put('/{catalog}/{item}', [CatalogController::class, 'update'])->name('update');
+
+            Route::get('/{catalog}/{item}/desactivar', [CatalogStatusController::class, 'confirmDeactivation'])->name('deactivate.confirm');
+            Route::patch('/{catalog}/{item}/desactivar', [CatalogStatusController::class, 'deactivate'])->name('deactivate');
+            Route::patch('/{catalog}/{item}/activar', [CatalogStatusController::class, 'activate'])->name('activate');
+        });
+
+        Route::get('/{catalog}', [CatalogController::class, 'index'])->name('index');
     });
 });
 

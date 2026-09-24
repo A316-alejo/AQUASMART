@@ -15,6 +15,7 @@
         ],
         'Administración' => [
             ['route' => 'users.index', 'active' => 'users.*', 'icon' => 'users', 'label' => 'Usuarios', 'can' => 'manage-users'],
+            ['route' => 'catalogs.home', 'active' => 'catalogs.*', 'icon' => 'catalog', 'label' => 'Catálogos', 'can' => ['viewAny', App\Models\Species::class]],
         ],
     ];
 @endphp

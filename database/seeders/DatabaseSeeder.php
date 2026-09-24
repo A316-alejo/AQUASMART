@@ -24,5 +24,7 @@ class DatabaseSeeder extends Seeder
         if ($admin->wasRecentlyCreated) {
             $this->command->warn('Administrador creado: admin@aquasmart.test / password. Cambia esta contraseña.');
         }
+
+        $this->call(CatalogSeeder::class);
     }
 }

@@ -29,6 +29,9 @@
         @case('users')
             <circle cx="12" cy="8" r="3.5"/><path d="M5 20c.8-3.8 3.6-6 7-6s6.2 2.2 7 6"/>
             @break
+        @case('catalog')
+            <path d="M5 5.5A2.5 2.5 0 0 1 7.5 3H19v15H7.5A2.5 2.5 0 0 0 5 20.5Z"/><path d="M5 20.5A2.5 2.5 0 0 1 7.5 18H19v3H7.5"/><path d="M9 7.5h6M9 11h4"/>
+            @break
         @case('menu')
             <path d="M4 7h16M4 12h16M4 17h16"/>
             @break
