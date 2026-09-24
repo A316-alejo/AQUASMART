@@ -39,7 +39,7 @@ class LoginRequest extends FormRequest
 
         $credentials = $this->only('email', 'password');
 
-        if (Auth::attemptWhen($credentials, fn (User $user) => $user->is_active, $this->boolean('remember'))) {
+        if (Auth::attemptWhen($credentials, fn (User $user) => $user->canAccessSystem(), $this->boolean('remember'))) {
             RateLimiter::clear($this->throttleKey());
 
             return;
@@ -47,16 +47,25 @@ class LoginRequest extends FormRequest
 
         RateLimiter::hit($this->throttleKey());
 
+        throw ValidationException::withMessages([
+            'email' => __($this->failureMessageKey($credentials)),
+        ]);
+    }
+
+    /**
+     * Solo se revela por qué se bloqueó la cuenta a quien ya demostró conocer la contraseña.
+     *
+     * @param  array<string, mixed>  $credentials
+     */
+    private function failureMessageKey(array $credentials): string
+    {
         $user = Auth::getLastAttempted();
 
-        // Solo se revela que la cuenta está desactivada a quien ya demostró conocer la contraseña.
-        $inactive = $user instanceof User
-            && ! $user->is_active
-            && Auth::getProvider()->validateCredentials($user, $credentials);
+        if (! $user instanceof User || ! Auth::getProvider()->validateCredentials($user, $credentials)) {
+            return 'auth.failed';
+        }
 
-        throw ValidationException::withMessages([
-            'email' => __($inactive ? 'auth.inactive' : 'auth.failed'),
-        ]);
+        return $user->is_active ? 'auth.producer_inactive' : 'auth.inactive';
     }
 
     /**

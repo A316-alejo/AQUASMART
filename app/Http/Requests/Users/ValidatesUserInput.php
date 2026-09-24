@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Users;
 
 use App\Enums\Role;
+use App\Models\Producer;
 use Closure;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
@@ -48,6 +49,33 @@ trait ValidatesUserInput
                     $fail('No puedes asignar un rol superior al tuyo.');
                 }
             },
+        ];
+    }
+
+    /**
+     * Un productor debe pertenecer a un productor; un administrador no puede pertenecer a ninguno.
+     *
+     * @return array<int, mixed>
+     */
+    protected function producerRules(?string $role): array
+    {
+        return [
+            Rule::requiredIf($role === Role::Producer->value),
+            Rule::prohibitedIf($role === Role::Admin->value),
+            'nullable',
+            'integer',
+            Rule::exists(Producer::class, 'id'),
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'producer_id.required' => 'Un usuario con rol Productor debe estar asociado a un productor.',
+            'producer_id.prohibited' => 'Un administrador no puede estar asociado a un productor.',
         ];
     }
 }

@@ -6,5 +6,6 @@ return [
     'password' => 'La contraseña es incorrecta.',
     'throttle' => 'Demasiados intentos de acceso. Intenta de nuevo en :seconds segundos.',
     'inactive' => 'Tu cuenta está desactivada. Contacta al administrador.',
+    'producer_inactive' => 'El productor al que pertenece tu cuenta está desactivado. Contacta al administrador.',
 
 ];

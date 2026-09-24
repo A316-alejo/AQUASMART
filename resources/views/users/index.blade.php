@@ -86,7 +86,12 @@
                                                     <span class="tag info plain" style="margin-left:4px">Tú</span>
                                                 @endif
                                             </b>
-                                            <span class="mail">{{ $user->email }}</span>
+                                            <span class="mail">
+                                                {{ $user->email }}
+                                                @if ($user->producer)
+                                                    · <a class="link" href="{{ route('producers.show', $user->producer) }}">{{ $user->producer->name }}</a>
+                                                @endif
+                                            </span>
                                         </span>
                                     </div>
                                 </td>

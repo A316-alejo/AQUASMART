@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\Role;
 use App\Http\Requests\Users\StoreUserRequest;
 use App\Http\Requests\Users\UpdateUserRequest;
+use App\Models\Producer;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -30,6 +31,7 @@ class UserController extends Controller
                 ->orWhere('email', 'like', '%'.$term.'%')))
             ->when($filters['role'] ?? null, fn ($query, string $role) => $query->where('role', $role))
             ->when($filters['status'] ?? null, fn ($query, string $status) => $query->where('is_active', $status === 'active'))
+            ->with('producer:id,name,is_active')
             ->orderBy('name')
             ->paginate(15)
             ->withQueryString();
@@ -55,6 +57,7 @@ class UserController extends Controller
         return view('users.create', [
             'user' => new User(['role' => Role::Viewer, 'is_active' => true]),
             'roles' => Role::assignableBy($request->user()->role),
+            'producers' => $this->producerOptions(),
         ]);
     }
 
@@ -73,6 +76,7 @@ class UserController extends Controller
         return view('users.edit', [
             'user' => $user,
             'roles' => Role::assignableBy($request->user()->role),
+            'producers' => $this->producerOptions(),
         ]);
     }
 
@@ -94,5 +98,19 @@ class UserController extends Controller
 
         return redirect()->route('users.index')
             ->with('status', "Se actualizaron los datos de {$user->name}.");
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function producerOptions(): array
+    {
+        return Producer::query()
+            ->orderBy('name')
+            ->get(['id', 'name', 'is_active'])
+            ->mapWithKeys(fn (Producer $producer) => [
+                $producer->id => $producer->name.($producer->is_active ? '' : ' (inactivo)'),
+            ])
+            ->all();
     }
 }

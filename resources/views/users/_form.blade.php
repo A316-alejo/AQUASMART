@@ -29,6 +29,12 @@
                            help="Administrador: control total · Productor: sus fincas · Técnico: registra datos · Consulta: solo lectura." />
         @endif
 
+        @unless ($isSelf)
+            <x-form.select name="producer_id" label="Productor asociado" :options="$producers" placeholder="Ninguno"
+                           :value="$user->producer_id"
+                           help="Obligatorio para el rol Productor; no aplica a administradores. Define qué información puede consultar." />
+        @endunless
+
         @unless ($isEdit)
             <x-form.select name="is_active" label="Estado" :options="['1' => 'Activo', '0' => 'Inactivo']"
                            :value="$user->is_active ? '1' : '0'" required

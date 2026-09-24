@@ -3,6 +3,7 @@
 namespace Tests\Feature\Users;
 
 use App\Enums\Role;
+use App\Models\Producer;
 use App\Models\User;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -145,11 +146,14 @@ class UserManagementTest extends TestCase
 
     public function test_admin_can_create_a_user(): void
     {
+        $producer = Producer::factory()->create();
+
         $this->actingAs($this->admin())
             ->post(route('users.store'), [
                 'name' => 'Pedro Productor',
                 'email' => '  Pedro@Finca.CO ',
                 'role' => Role::Producer->value,
+                'producer_id' => $producer->id,
                 'is_active' => '1',
                 'password' => 'Tilapia2026',
                 'password_confirmation' => 'Tilapia2026',
@@ -163,6 +167,7 @@ class UserManagementTest extends TestCase
         $this->assertSame('Pedro Productor', $user->name);
         $this->assertSame(Role::Producer, $user->role);
         $this->assertTrue($user->is_active);
+        $this->assertTrue($user->producer->is($producer));
     }
 
     public function test_admin_can_create_an_inactive_user(): void

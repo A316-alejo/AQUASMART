@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Enums\Role;
+use App\Models\Producer;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
@@ -33,6 +34,7 @@ class UserFactory extends Factory
             'remember_token' => Str::random(10),
             'role' => Role::Viewer,
             'is_active' => true,
+            'producer_id' => null,
         ];
     }
 
@@ -47,6 +49,13 @@ class UserFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'is_active' => false,
+        ]);
+    }
+
+    public function forProducer(Producer $producer): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'producer_id' => $producer->id,
         ]);
     }
 

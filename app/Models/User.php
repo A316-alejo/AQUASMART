@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\Role;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\DB;
@@ -24,6 +25,7 @@ class User extends Authenticatable
         'password',
         'role',
         'is_active',
+        'producer_id',
     ];
 
     /**
@@ -45,6 +47,31 @@ class User extends Authenticatable
             'role' => Role::class,
             'is_active' => 'boolean',
         ];
+    }
+
+    /**
+     * @return BelongsTo<Producer, $this>
+     */
+    public function producer(): BelongsTo
+    {
+        return $this->belongsTo(Producer::class);
+    }
+
+    /**
+     * Una cuenta puede usar el sistema si está activa y, cuando pertenece a un productor, ese productor también lo está.
+     */
+    public function canAccessSystem(): bool
+    {
+        return $this->is_active && ! $this->belongsToInactiveProducer();
+    }
+
+    public function belongsToInactiveProducer(): bool
+    {
+        if ($this->producer_id === null) {
+            return false;
+        }
+
+        return ! $this->loadMissing('producer')->producer->is_active;
     }
 
     public function hasRole(Role ...$roles): bool

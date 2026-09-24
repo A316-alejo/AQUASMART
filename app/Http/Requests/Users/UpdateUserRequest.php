@@ -38,6 +38,7 @@ class UpdateUserRequest extends FormRequest
                     }
                 },
             ],
+            'producer_id' => $this->producerRules((string) $this->input('role', $user->role->value)),
             'password' => ['nullable', 'string', 'confirmed', Password::defaults()],
             'current_password' => $isSelf
                 ? ['nullable', 'required_with:password', 'current_password']

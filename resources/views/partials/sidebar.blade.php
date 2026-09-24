@@ -3,7 +3,7 @@
     $navigation = [
         'Operación' => [
             ['route' => 'dashboard', 'active' => 'dashboard', 'icon' => 'dashboard', 'label' => 'Dashboard general'],
-            ['route' => 'producers.index', 'active' => 'producers.*', 'icon' => 'producers', 'label' => 'Productores'],
+            ['route' => 'producers.index', 'active' => 'producers.*', 'icon' => 'producers', 'label' => 'Productores', 'can' => ['viewAny', App\Models\Producer::class]],
             ['route' => 'farms.index', 'active' => 'farms.*', 'icon' => 'farm', 'label' => 'Fincas'],
             ['route' => 'ponds.index', 'active' => 'ponds.*', 'icon' => 'pond', 'label' => 'Gestión de estanques'],
             ['route' => 'batches.index', 'active' => 'batches.*', 'icon' => 'fish', 'label' => 'Lotes'],
@@ -25,7 +25,7 @@
         @foreach ($navigation as $group => $items)
             @php
                 $items = array_filter($items, fn ($item) => Route::has($item['route'])
-                    && (! isset($item['can']) || Gate::allows($item['can'])));
+                    && (! isset($item['can']) || Gate::allows(...(array) $item['can'])));
             @endphp
             @continue(empty($items))
 

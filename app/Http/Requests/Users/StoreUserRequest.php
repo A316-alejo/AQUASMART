@@ -25,6 +25,7 @@ class StoreUserRequest extends FormRequest
             'name' => $this->nameRules(),
             'email' => [...$this->emailRules(), Rule::unique(User::class, 'email')],
             'role' => ['required', ...$this->roleRules()],
+            'producer_id' => $this->producerRules((string) $this->input('role')),
             'is_active' => ['required', 'boolean'],
             'password' => ['required', 'string', 'confirmed', Password::defaults()],
         ];
