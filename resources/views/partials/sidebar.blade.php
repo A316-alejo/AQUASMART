@@ -5,7 +5,7 @@
             ['route' => 'dashboard', 'active' => 'dashboard', 'icon' => 'dashboard', 'label' => 'Dashboard general'],
             ['route' => 'producers.index', 'active' => 'producers.*', 'icon' => 'producers', 'label' => 'Productores', 'can' => ['viewAny', App\Models\Producer::class]],
             ['route' => 'farms.index', 'active' => 'farms.*', 'icon' => 'farm', 'label' => 'Fincas', 'can' => ['viewAny', App\Models\Farm::class]],
-            ['route' => 'ponds.index', 'active' => 'ponds.*', 'icon' => 'pond', 'label' => 'Gestión de estanques'],
+            ['route' => 'ponds.index', 'active' => 'ponds.*', 'icon' => 'pond', 'label' => 'Gestión de estanques', 'can' => ['viewAny', App\Models\Pond::class]],
             ['route' => 'batches.index', 'active' => 'batches.*', 'icon' => 'fish', 'label' => 'Lotes'],
             ['route' => 'devices.index', 'active' => 'devices.*', 'icon' => 'iot', 'label' => 'Centro IoT'],
             ['route' => 'alerts.index', 'active' => 'alerts.*', 'icon' => 'alert', 'label' => 'Centro de alertas'],

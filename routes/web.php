@@ -4,12 +4,15 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FarmAssignmentController;
 use App\Http\Controllers\FarmController;
 use App\Http\Controllers\FarmStatusController;
+use App\Http\Controllers\PondController;
+use App\Http\Controllers\PondStatusController;
 use App\Http\Controllers\ProducerController;
 use App\Http\Controllers\ProducerStatusController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserPasswordResetLinkController;
 use App\Http\Controllers\UserStatusController;
 use App\Models\Farm;
+use App\Models\Pond;
 use App\Models\Producer;
 use Illuminate\Support\Facades\Route;
 
@@ -67,6 +70,22 @@ Route::middleware(['auth', 'active'])->group(function () {
 
         Route::get('/', [FarmController::class, 'index'])->middleware('can:viewAny,'.Farm::class)->name('index');
         Route::get('/{farm}', [FarmController::class, 'show'])->middleware('can:view,farm')->name('show');
+    });
+
+    Route::prefix('estanques')->name('ponds.')->group(function () {
+        Route::middleware('can:manage-ponds')->group(function () {
+            Route::get('/crear', [PondController::class, 'create'])->name('create');
+            Route::post('/', [PondController::class, 'store'])->name('store');
+            Route::get('/{pond}/editar', [PondController::class, 'edit'])->name('edit');
+            Route::put('/{pond}', [PondController::class, 'update'])->name('update');
+
+            Route::get('/{pond}/desactivar', [PondStatusController::class, 'confirmDeactivation'])->name('deactivate.confirm');
+            Route::patch('/{pond}/desactivar', [PondStatusController::class, 'deactivate'])->name('deactivate');
+            Route::patch('/{pond}/activar', [PondStatusController::class, 'activate'])->name('activate');
+        });
+
+        Route::get('/', [PondController::class, 'index'])->middleware('can:viewAny,'.Pond::class)->name('index');
+        Route::get('/{pond}', [PondController::class, 'show'])->middleware('can:view,pond')->name('show');
     });
 });
 

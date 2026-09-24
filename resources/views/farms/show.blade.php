@@ -68,10 +68,31 @@
             </div>
 
             <div class="card">
-                <header><h3>Estanques</h3></header>
-                <p style="color:var(--ink-3);font-size:13px;margin:0">
-                    Los estanques de esta finca aparecerán aquí cuando se habilite el módulo de Estanques.
-                </p>
+                <header>
+                    <h3>Estanques</h3>
+                    <span class="tag info plain">{{ $farm->ponds->count() }}</span>
+                </header>
+                @forelse ($farm->ponds as $pond)
+                    <div class="list-row">
+                        <span class="sev info" aria-hidden="true"><x-icon name="pond" style="width:18px;height:18px" /></span>
+                        <span class="body">
+                            <b>{{ $pond->code }} · {{ $pond->name }}</b>
+                            <span>
+                                {{ $pond->type->label() }}
+                                @if ($pond->volume_m3 !== null) · {{ number_format((float) $pond->volume_m3, 0, ',', '.') }} m³ @endif
+                                {{ $pond->is_active ? '' : '· Inactivo' }}
+                            </span>
+                        </span>
+                        <a class="btn sm" href="{{ route('ponds.show', $pond) }}">Ver</a>
+                    </div>
+                @empty
+                    <p style="color:var(--ink-3);font-size:13px;margin:0">Esta finca todavía no tiene estanques registrados.</p>
+                @endforelse
+                @can('create', App\Models\Pond::class)
+                    @if ($farm->is_active)
+                        <a class="btn block sm" style="margin-top:12px" href="{{ route('ponds.create', ['farm' => $farm->id]) }}">Nuevo estanque</a>
+                    @endif
+                @endcan
             </div>
         </div>
 

@@ -87,6 +87,7 @@ class FarmController extends Controller
         $farm->load([
             'producer',
             'users' => fn ($query) => $query->orderBy('name'),
+            'ponds' => fn ($query) => $query->orderBy('code'),
         ]);
 
         return view('farms.show', [
