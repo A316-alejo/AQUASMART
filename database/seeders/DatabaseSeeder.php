@@ -2,24 +2,27 @@
 
 namespace Database\Seeders;
 
+use App\Enums\Role;
 use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
-    use WithoutModelEvents;
-
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
-        // User::factory(10)->create();
+        $admin = User::firstOrCreate(
+            ['email' => 'admin@aquasmart.test'],
+            [
+                'name' => 'Administrador AquaSmart',
+                'password' => 'password',
+                'role' => Role::Admin,
+                'is_active' => true,
+                'email_verified_at' => now(),
+            ],
+        );
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        if ($admin->wasRecentlyCreated) {
+            $this->command->warn('Administrador creado: admin@aquasmart.test / password. Cambia esta contraseña.');
+        }
     }
 }
