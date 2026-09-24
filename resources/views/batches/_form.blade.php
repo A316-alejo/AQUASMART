@@ -38,12 +38,5 @@
         <x-form.input name="initial_average_weight_g" label="Peso promedio inicial (g)" inputmode="decimal"
                       :value="$batch->initial_average_weight_g" required />
     </div>
-    <div class="field">
-        <label for="notes">Observaciones (opcional)</label>
-        <textarea id="notes" name="notes" rows="3" maxlength="1000" @class(['input', 'is-invalid' => $errors->has('notes')])
-                  @error('notes') aria-invalid="true" aria-describedby="notes-error" @enderror>{{ old('notes', $batch->notes) }}</textarea>
-        @error('notes')
-            <span class="error" id="notes-error">{{ $message }}</span>
-        @enderror
-    </div>
+    <x-form.textarea name="notes" label="Observaciones (opcional)" :value="$batch->notes" maxlength="1000" />
 </section>

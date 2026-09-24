@@ -72,5 +72,9 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('manage-catalogs', fn (User $user) => $user->is_active && $user->isAdmin());
 
         Gate::define('manage-batches', fn (User $user) => $user->is_active && $user->isAdmin());
+
+        // Registros productivos (alimentación, mortalidad, biometría): roles operativos; consulta solo lee.
+        Gate::define('record-production', fn (User $user) => $user->is_active
+            && $user->hasRole(Role::Admin, Role::Producer, Role::Technician));
     }
 }

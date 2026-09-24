@@ -6,6 +6,7 @@ use App\Models\Concerns\IsCatalogItem;
 use Database\Factories\MortalityCauseFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class MortalityCause extends Model
 {
@@ -30,6 +31,14 @@ class MortalityCause extends Model
         return [
             'is_active' => 'boolean',
         ];
+    }
+
+    /**
+     * @return HasMany<Mortality, $this>
+     */
+    public function mortalities(): HasMany
+    {
+        return $this->hasMany(Mortality::class);
     }
 
     public function catalogLabel(): string

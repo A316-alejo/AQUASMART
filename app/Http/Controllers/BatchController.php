@@ -7,8 +7,11 @@ use App\Http\Requests\Batches\StoreBatchRequest;
 use App\Http\Requests\Batches\UpdateBatchRequest;
 use App\Models\Batch;
 use App\Models\Farm;
+use App\Models\FeedType;
+use App\Models\MortalityCause;
 use App\Models\Pond;
 use App\Models\Species;
+use App\Services\BiomassCalculator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -79,11 +82,35 @@ class BatchController extends Controller
             ->with('status', "Se registró el lote {$batch->code}.");
     }
 
-    public function show(Batch $batch): View
+    public function show(Request $request, Batch $batch, BiomassCalculator $calculator): View
     {
         Gate::authorize('view', $batch);
 
-        return view('batches.show', ['batch' => $batch->load(['pond.farm.producer', 'species'])]);
+        $batch->load(['pond.farm.producer', 'species', 'latestSampling'])
+            ->loadSum('mortalities', 'quantity')
+            ->loadSum('feedings', 'quantity_g');
+
+        $canRecord = $request->user()->can('record', $batch);
+
+        return view('batches.show', [
+            'batch' => $batch,
+            'estimate' => $calculator->estimate($batch),
+            'canRecord' => $canRecord,
+            'feedings' => $batch->feedings()
+                ->with(['feedType:id,name,brand', 'user:id,name'])
+                ->orderByDesc('fed_on')->orderByDesc('id')
+                ->paginate(10, pageName: 'alimentacion')->withQueryString()->fragment('feeding'),
+            'mortalities' => $batch->mortalities()
+                ->with(['cause:id,name', 'user:id,name'])
+                ->orderByDesc('recorded_on')->orderByDesc('id')
+                ->paginate(10, pageName: 'mortalidad')->withQueryString()->fragment('mortality'),
+            'samplings' => $batch->samplings()
+                ->with('user:id,name')
+                ->orderByDesc('sampled_on')->orderByDesc('id')
+                ->paginate(10, pageName: 'biometria')->withQueryString()->fragment('sampling'),
+            'feedTypes' => $canRecord ? FeedType::active()->ordered()->get()->mapWithKeys(fn (FeedType $type) => [$type->id => $type->catalogLabel()])->all() : [],
+            'causes' => $canRecord ? MortalityCause::active()->ordered()->pluck('name', 'id')->all() : [],
+        ]);
     }
 
     public function edit(Batch $batch): View

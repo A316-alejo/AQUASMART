@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Gate;
 
@@ -71,6 +73,54 @@ class Batch extends Model
     public function species(): BelongsTo
     {
         return $this->belongsTo(Species::class);
+    }
+
+    /**
+     * @return HasMany<Feeding, $this>
+     */
+    public function feedings(): HasMany
+    {
+        return $this->hasMany(Feeding::class);
+    }
+
+    /**
+     * @return HasMany<Mortality, $this>
+     */
+    public function mortalities(): HasMany
+    {
+        return $this->hasMany(Mortality::class);
+    }
+
+    /**
+     * @return HasMany<Sampling, $this>
+     */
+    public function samplings(): HasMany
+    {
+        return $this->hasMany(Sampling::class);
+    }
+
+    /**
+     * Biometría más reciente (por fecha y, a igual fecha, la última registrada).
+     *
+     * @return HasOne<Sampling, $this>
+     */
+    public function latestSampling(): HasOne
+    {
+        return $this->hasOne(Sampling::class)->ofMany(['sampled_on' => 'max', 'id' => 'max']);
+    }
+
+    /**
+     * Fecha del primer registro productivo; la siembra no puede moverse después de ella.
+     */
+    public function firstRecordDate(): ?Carbon
+    {
+        $dates = array_filter([
+            $this->feedings()->min('fed_on'),
+            $this->mortalities()->min('recorded_on'),
+            $this->samplings()->min('sampled_on'),
+        ]);
+
+        return $dates ? Carbon::parse(min($dates)) : null;
     }
 
     public function isActive(): bool

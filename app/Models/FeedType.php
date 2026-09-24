@@ -6,6 +6,7 @@ use App\Models\Concerns\IsCatalogItem;
 use Database\Factories\FeedTypeFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class FeedType extends Model
 {
@@ -35,6 +36,14 @@ class FeedType extends Model
             'pellet_mm' => 'decimal:2',
             'is_active' => 'boolean',
         ];
+    }
+
+    /**
+     * @return HasMany<Feeding, $this>
+     */
+    public function feedings(): HasMany
+    {
+        return $this->hasMany(Feeding::class);
     }
 
     public function catalogLabel(): string

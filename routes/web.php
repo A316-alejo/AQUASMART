@@ -9,10 +9,13 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FarmAssignmentController;
 use App\Http\Controllers\FarmController;
 use App\Http\Controllers\FarmStatusController;
+use App\Http\Controllers\FeedingController;
+use App\Http\Controllers\MortalityController;
 use App\Http\Controllers\PondController;
 use App\Http\Controllers\PondStatusController;
 use App\Http\Controllers\ProducerController;
 use App\Http\Controllers\ProducerStatusController;
+use App\Http\Controllers\SamplingController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserPasswordResetLinkController;
 use App\Http\Controllers\UserStatusController;
@@ -109,6 +112,13 @@ Route::middleware(['auth', 'active'])->group(function () {
 
         Route::get('/', [BatchController::class, 'index'])->middleware('can:viewAny,'.Batch::class)->name('index');
         Route::get('/{batch}', [BatchController::class, 'show'])->middleware('can:view,batch')->name('show');
+
+        // Registros productivos: roles operativos sobre lotes activos a los que tienen acceso.
+        Route::middleware('can:record,batch')->group(function () {
+            Route::post('/{batch}/alimentacion', [FeedingController::class, 'store'])->name('feedings.store');
+            Route::post('/{batch}/mortalidad', [MortalityController::class, 'store'])->name('mortalities.store');
+            Route::post('/{batch}/biometrias', [SamplingController::class, 'store'])->name('samplings.store');
+        });
     });
 
     Route::prefix('catalogos')->name('catalogs.')->group(function () {

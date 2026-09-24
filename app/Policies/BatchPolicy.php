@@ -45,6 +45,17 @@ class BatchPolicy
         return $this->manages($user) && $batch->isActive();
     }
 
+    /**
+     * Registrar alimentación, mortalidad y biometrías: roles operativos (admin, productor, técnico)
+     * sobre lotes activos que puedan consultar. El rol consulta es de solo lectura.
+     */
+    public function record(User $user, Batch $batch): bool
+    {
+        return $batch->isActive()
+            && Gate::forUser($user)->allows('record-production')
+            && ($this->manages($user) || $batch->isVisibleTo($user));
+    }
+
     private function manages(User $user): bool
     {
         return Gate::forUser($user)->allows('manage-batches');

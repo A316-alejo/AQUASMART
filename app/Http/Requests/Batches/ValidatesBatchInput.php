@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Batches;
 
 use App\Models\Batch;
+use Closure;
 use App\Models\Species;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Str;
@@ -57,8 +58,28 @@ trait ValidatesBatchInput
                     ->where('is_active', true)
                     ->when($batch?->species_id, fn (Builder $query, int $current) => $query->orWhere('id', $current))),
             ],
-            'stocked_at' => ['required', 'date_format:Y-m-d', 'after_or_equal:2000-01-01', 'before_or_equal:today'],
-            'initial_quantity' => ['required', 'integer', 'min:1', 'max:10000000'],
+            'stocked_at' => [
+                'required', 'date_format:Y-m-d', 'after_or_equal:2000-01-01', 'before_or_equal:today',
+                // Con registros productivos, la siembra no puede quedar después del primero.
+                function (string $attribute, mixed $value, Closure $fail) use ($batch) {
+                    $first = $batch?->firstRecordDate();
+
+                    if ($first && is_string($value) && $value > $first->toDateString()) {
+                        $fail('La fecha de siembra no puede ser posterior al primer registro productivo del lote ('.$first->format('d/m/Y').').');
+                    }
+                },
+            ],
+            'initial_quantity' => [
+                'required', 'integer', 'min:1', 'max:10000000',
+                // Con mortalidad registrada, la siembra no puede quedar por debajo de los peces ya muertos.
+                function (string $attribute, mixed $value, Closure $fail) use ($batch) {
+                    $dead = $batch ? (int) $batch->mortalities()->sum('quantity') : 0;
+
+                    if (is_numeric($value) && (int) $value < $dead) {
+                        $fail('La cantidad sembrada no puede ser menor que la mortalidad ya registrada ('.number_format($dead, 0, ',', '.').').');
+                    }
+                },
+            ],
             'initial_average_weight_g' => ['required', 'numeric', 'gt:0', 'max:5000', 'decimal:0,2'],
             'notes' => ['nullable', 'string', 'max:1000'],
         ];
