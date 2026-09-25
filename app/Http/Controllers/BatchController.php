@@ -8,10 +8,12 @@ use App\Http\Requests\Batches\UpdateBatchRequest;
 use App\Models\Batch;
 use App\Models\Farm;
 use App\Models\FeedType;
+use App\Models\Metric;
 use App\Models\MortalityCause;
 use App\Models\Pond;
 use App\Models\Species;
 use App\Services\BiomassCalculator;
+use App\Services\WaterQualityEvaluator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -86,11 +88,17 @@ class BatchController extends Controller
     {
         Gate::authorize('view', $batch);
 
-        $batch->load(['pond.farm.producer', 'species', 'latestSampling'])
+        $batch->load(['pond.farm.producer', 'pond.farm.alertRules', 'species', 'latestSampling'])
             ->loadSum('mortalities', 'quantity')
             ->loadSum('feedings', 'quantity_g');
 
         $canRecord = $request->user()->can('record', $batch);
+
+        $waterFilters = $request->validate([
+            'wq_metric' => ['nullable', 'integer'],
+            'wq_from' => ['nullable', 'date_format:Y-m-d'],
+            'wq_to' => ['nullable', 'date_format:Y-m-d'],
+        ]);
 
         return view('batches.show', [
             'batch' => $batch,
@@ -108,6 +116,17 @@ class BatchController extends Controller
                 ->with('user:id,name')
                 ->orderByDesc('sampled_on')->orderByDesc('id')
                 ->paginate(10, pageName: 'biometria')->withQueryString()->fragment('sampling'),
+            'waterReadings' => $batch->waterQualityReadings()
+                ->with(['metric:id,code,name,unit,decimals,min_value,max_value', 'user:id,name'])
+                ->when($waterFilters['wq_metric'] ?? null, fn (Builder $query, int $metricId) => $query->where('metric_id', $metricId))
+                ->when($waterFilters['wq_from'] ?? null, fn (Builder $query, string $date) => $query->whereDate('measured_at', '>=', $date))
+                ->when($waterFilters['wq_to'] ?? null, fn (Builder $query, string $date) => $query->whereDate('measured_at', '<=', $date))
+                ->orderByDesc('measured_at')->orderByDesc('id')
+                ->paginate(10, pageName: 'calidad')->withQueryString()->fragment('water-quality'),
+            'waterFilters' => $waterFilters,
+            'waterMetrics' => Metric::active()->ordered()->pluck('name', 'id')->all(),
+            'alertRules' => $batch->pond->farm->alertRules,
+            'evaluator' => app(WaterQualityEvaluator::class),
             'feedTypes' => $canRecord ? FeedType::active()->ordered()->get()->mapWithKeys(fn (FeedType $type) => [$type->id => $type->catalogLabel()])->all() : [],
             'causes' => $canRecord ? MortalityCause::active()->ordered()->pluck('name', 'id')->all() : [],
         ]);

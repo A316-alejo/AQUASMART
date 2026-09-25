@@ -8,11 +8,13 @@ use App\Models\Farm;
 use App\Models\Feeding;
 use App\Models\FeedType;
 use App\Models\Mortality;
+use App\Models\Metric;
 use App\Models\MortalityCause;
 use App\Models\Pond;
 use App\Models\Producer;
 use App\Models\Sampling;
 use App\Models\User;
+use App\Models\WaterQualityReading;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
@@ -35,6 +37,8 @@ class ProductionAccessTest extends TestCase
 
     private MortalityCause $cause;
 
+    private Metric $metric;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -50,6 +54,7 @@ class ProductionAccessTest extends TestCase
 
         $this->feedType = FeedType::factory()->create();
         $this->cause = MortalityCause::factory()->create();
+        $this->metric = Metric::factory()->create(['min_value' => 0, 'max_value' => 100]);
     }
 
     private function userFor(Role $role): User
@@ -64,7 +69,7 @@ class ProductionAccessTest extends TestCase
     }
 
     /**
-     * Las tres solicitudes de registro sobre un lote.
+     * Las cuatro solicitudes de registro sobre un lote.
      *
      * @return list<array{0: string, 1: array<string, mixed>}>
      */
@@ -76,12 +81,13 @@ class ProductionAccessTest extends TestCase
             [route('batches.feedings.store', $batch), ['feeding_date' => $date, 'feed_type_id' => $this->feedType->id, 'feeding_quantity_g' => '1000']],
             [route('batches.mortalities.store', $batch), ['mortality_date' => $date, 'mortality_cause_id' => $this->cause->id, 'mortality_quantity' => '5']],
             [route('batches.samplings.store', $batch), ['sampling_date' => $date, 'sample_size' => '30', 'average_weight_g' => '40']],
+            [route('batches.water-quality.store', $batch), ['water_quality_date' => $date.'T08:00', 'water_quality_metric_id' => $this->metric->id, 'water_quality_value' => '20']],
         ];
     }
 
     private function recordCount(): int
     {
-        return Feeding::count() + Mortality::count() + Sampling::count();
+        return Feeding::count() + Mortality::count() + Sampling::count() + WaterQualityReading::count();
     }
 
     /**
@@ -113,14 +119,17 @@ class ProductionAccessTest extends TestCase
             $this->actingAs($user)->post($url, $data)->assertSessionHasNoErrors()->assertRedirect();
         }
 
-        $this->assertSame(3, $this->assignedBatch->feedings()->count() + $this->assignedBatch->mortalities()->count() + $this->assignedBatch->samplings()->count());
+        $this->assertSame(4, $this->assignedBatch->feedings()->count() + $this->assignedBatch->mortalities()->count()
+            + $this->assignedBatch->samplings()->count() + $this->assignedBatch->waterQualityReadings()->count());
         $this->assertTrue(Feeding::sole()->user->is($user));
+        $this->assertTrue(WaterQualityReading::sole()->user->is($user));
 
         $this->get(route('batches.show', $this->assignedBatch))
             ->assertOk()
             ->assertSee('Registrar alimentación')
             ->assertSee('Registrar mortalidad')
-            ->assertSee('Registrar biometría');
+            ->assertSee('Registrar biometría')
+            ->assertSee('Registrar medición');
     }
 
     public function test_producer_is_isolated_to_their_own_farms(): void
@@ -172,7 +181,8 @@ class ProductionAccessTest extends TestCase
             ->assertSee('Biomasa estimada')
             ->assertDontSee('Registrar alimentación')
             ->assertDontSee('Registrar mortalidad')
-            ->assertDontSee('Registrar biometría');
+            ->assertDontSee('Registrar biometría')
+            ->assertDontSee('Registrar medición');
 
         foreach ($this->recordRequests($this->assignedBatch) as [$url, $data]) {
             $this->post($url, $data)->assertForbidden();

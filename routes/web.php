@@ -19,6 +19,7 @@ use App\Http\Controllers\SamplingController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserPasswordResetLinkController;
 use App\Http\Controllers\UserStatusController;
+use App\Http\Controllers\WaterQualityReadingController;
 use App\Models\Batch;
 use App\Models\Farm;
 use App\Models\Pond;
@@ -118,6 +119,7 @@ Route::middleware(['auth', 'active'])->group(function () {
             Route::post('/{batch}/alimentacion', [FeedingController::class, 'store'])->name('feedings.store');
             Route::post('/{batch}/mortalidad', [MortalityController::class, 'store'])->name('mortalities.store');
             Route::post('/{batch}/biometrias', [SamplingController::class, 'store'])->name('samplings.store');
+            Route::post('/{batch}/calidad-agua', [WaterQualityReadingController::class, 'store'])->name('water-quality.store');
         });
     });
 

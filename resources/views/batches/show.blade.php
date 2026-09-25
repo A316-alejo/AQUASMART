@@ -7,6 +7,8 @@
     $dec = fn ($value, $decimals = 2) => number_format((float) $value, $decimals, ',', '.');
     $today = today()->toDateString();
     $stocked = $batch->stocked_at->toDateString();
+    $nowLocal = now()->format('Y-m-d\TH:i');
+    $stockedLocal = $stocked.'T00:00';
 @endphp
 
 @section('content')
@@ -45,6 +47,7 @@
         <a class="chip" href="#feeding">Alimentación <span class="count">{{ $feedings->total() }}</span></a>
         <a class="chip" href="#mortality">Mortalidad <span class="count">{{ $mortalities->total() }}</span></a>
         <a class="chip" href="#sampling">Biometría <span class="count">{{ $samplings->total() }}</span></a>
+        <a class="chip" href="#water-quality">Calidad del agua <span class="count">{{ $waterReadings->total() }}</span></a>
     </nav>
 
     <section id="summary" class="anchor-target" aria-label="Resumen productivo">
@@ -269,6 +272,75 @@
                 </table>
             </div>
             {{ $samplings->links() }}
+        @endif
+    </section>
+
+    {{-- Calidad del agua --}}
+    <section id="water-quality" class="card anchor-target" style="margin-top:14px">
+        <header>
+            <h3>Calidad del agua</h3>
+            <span class="tag info plain">{{ $waterReadings->total() }}</span>
+        </header>
+
+        @if ($canRecord)
+            <form class="record-form" method="POST" action="{{ route('batches.water-quality.store', $batch) }}" novalidate>
+                @csrf
+                <div class="grid g3">
+                    <x-form.input name="water_quality_date" label="Fecha y hora" type="datetime-local" :value="$nowLocal"
+                                  min="{{ $stockedLocal }}" max="{{ $nowLocal }}" required />
+                    <x-form.select name="water_quality_metric_id" label="Parámetro" :options="$waterMetrics" placeholder="Selecciona un parámetro" required />
+                    <x-form.input name="water_quality_value" label="Valor" inputmode="decimal" required
+                                  help="Debe estar dentro del rango físico válido del parámetro (ver catálogos)." />
+                </div>
+                <x-form.textarea name="water_quality_notes" label="Observaciones (opcional)" maxlength="1000" rows="2" />
+                <div class="form-actions"><button type="submit" class="btn primary">Registrar medición</button></div>
+            </form>
+        @endif
+
+        <form class="filters" method="GET" action="{{ route('batches.show', $batch) }}#water-quality" role="search">
+            <x-form.select name="wq_metric" label="Parámetro" placeholder="Todos" :options="$waterMetrics" :value="$waterFilters['wq_metric'] ?? null" />
+            <x-form.input name="wq_from" label="Desde" type="date" :value="$waterFilters['wq_from'] ?? null" max="{{ $today }}" />
+            <x-form.input name="wq_to" label="Hasta" type="date" :value="$waterFilters['wq_to'] ?? null" max="{{ $today }}" />
+            <div class="btns">
+                <button type="submit" class="btn">Filtrar</button>
+                @if (array_filter($waterFilters))
+                    <a class="btn ghost" href="{{ route('batches.show', $batch) }}#water-quality">Limpiar</a>
+                @endif
+            </div>
+        </form>
+
+        @if ($waterReadings->isEmpty())
+            <p class="muted-line">Todavía no hay mediciones de calidad del agua.</p>
+        @else
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th scope="col">Fecha y hora</th>
+                            <th scope="col">Parámetro</th>
+                            <th scope="col" class="num">Valor</th>
+                            <th scope="col">Estado</th>
+                            <th scope="col">Registrado por</th>
+                            <th scope="col">Observaciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($waterReadings as $reading)
+                            <tr>
+                                <td class="nowrap">{{ $reading->measured_at->format('d/m/Y H:i') }}</td>
+                                <td>{{ $reading->metric->name }}</td>
+                                <td class="num nowrap">{{ $reading->metric->format($reading->value) }}</td>
+                                <td>
+                                    <x-quality-status :status="$evaluator->evaluate($reading->metric, (float) $reading->value, $evaluator->ruleFor($alertRules, $reading->metric_id))" />
+                                </td>
+                                <td>{{ $reading->user?->name ?? '—' }}</td>
+                                <td class="notes-cell">{{ $reading->notes ?: '—' }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+            {{ $waterReadings->links() }}
         @endif
     </section>
 @endsection

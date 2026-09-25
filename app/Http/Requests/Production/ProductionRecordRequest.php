@@ -51,6 +51,21 @@ abstract class ProductionRecordRequest extends FormRequest
     }
 
     /**
+     * Fecha y hora entre la siembra (00:00) y el momento actual. Usada por registros con
+     * precisión horaria (calidad del agua), a diferencia de dateRules() que solo exige un día.
+     *
+     * @return array<int, string>
+     */
+    protected function dateTimeRules(): array
+    {
+        return [
+            'required', 'date_format:Y-m-d\TH:i',
+            'after_or_equal:'.$this->batch()->stocked_at->toDateString(),
+            'before_or_equal:now',
+        ];
+    }
+
+    /**
      * @return array<string, string>
      */
     public function messages(): array

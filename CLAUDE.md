@@ -82,7 +82,7 @@ Orden oficial:
 6. Catálogos y especies ✔
 7. Lotes/ciclos de producción ✔
 8. Alimentación, mortalidad, biometría y biomasa ✔
-9. Calidad del agua y mediciones
+9. Calidad del agua y mediciones ✔
 10. Centro de alertas
 11. Dashboard
 12. IoT, dispositivos, sensores y API

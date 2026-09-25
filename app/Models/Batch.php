@@ -100,6 +100,14 @@ class Batch extends Model
     }
 
     /**
+     * @return HasMany<WaterQualityReading, $this>
+     */
+    public function waterQualityReadings(): HasMany
+    {
+        return $this->hasMany(WaterQualityReading::class);
+    }
+
+    /**
      * Biometría más reciente (por fecha y, a igual fecha, la última registrada).
      *
      * @return HasOne<Sampling, $this>
@@ -118,6 +126,7 @@ class Batch extends Model
             $this->feedings()->min('fed_on'),
             $this->mortalities()->min('recorded_on'),
             $this->samplings()->min('sampled_on'),
+            $this->waterQualityReadings()->min('measured_at'),
         ]);
 
         return $dates ? Carbon::parse(min($dates)) : null;

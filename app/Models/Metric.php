@@ -6,6 +6,7 @@ use App\Models\Concerns\IsCatalogItem;
 use Database\Factories\MetricFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * Parámetro de calidad del agua (temperatura, pH, oxígeno disuelto…).
@@ -42,6 +43,22 @@ class Metric extends Model
             'max_value' => 'decimal:3',
             'is_active' => 'boolean',
         ];
+    }
+
+    /**
+     * @return HasMany<WaterQualityReading, $this>
+     */
+    public function waterQualityReadings(): HasMany
+    {
+        return $this->hasMany(WaterQualityReading::class);
+    }
+
+    /**
+     * @return HasMany<AlertRule, $this>
+     */
+    public function alertRules(): HasMany
+    {
+        return $this->hasMany(AlertRule::class);
     }
 
     public function catalogLabel(): string

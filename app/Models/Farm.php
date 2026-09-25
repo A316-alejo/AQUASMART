@@ -75,6 +75,16 @@ class Farm extends Model
     }
 
     /**
+     * Umbrales de alerta configurados para los parámetros de calidad del agua de la finca.
+     *
+     * @return HasMany<AlertRule, $this>
+     */
+    public function alertRules(): HasMany
+    {
+        return $this->hasMany(AlertRule::class);
+    }
+
+    /**
      * Personal asignado a la finca (técnicos y usuarios de consulta).
      *
      * @return BelongsToMany<User, $this>
