@@ -1,6 +1,8 @@
 <?php
 
 use App\Enums\Catalog;
+use App\Http\Controllers\AlertActionController;
+use App\Http\Controllers\AlertController;
 use App\Http\Controllers\BatchClosureController;
 use App\Http\Controllers\BatchController;
 use App\Http\Controllers\CatalogController;
@@ -20,6 +22,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserPasswordResetLinkController;
 use App\Http\Controllers\UserStatusController;
 use App\Http\Controllers\WaterQualityReadingController;
+use App\Models\Alert;
 use App\Models\Batch;
 use App\Models\Farm;
 use App\Models\Pond;
@@ -121,6 +124,12 @@ Route::middleware(['auth', 'active'])->group(function () {
             Route::post('/{batch}/biometrias', [SamplingController::class, 'store'])->name('samplings.store');
             Route::post('/{batch}/calidad-agua', [WaterQualityReadingController::class, 'store'])->name('water-quality.store');
         });
+    });
+
+    Route::prefix('alertas')->name('alerts.')->group(function () {
+        Route::get('/', [AlertController::class, 'index'])->middleware('can:viewAny,'.Alert::class)->name('index');
+        Route::patch('/{alert}/reconocer', [AlertActionController::class, 'acknowledge'])->middleware('can:acknowledge,alert')->name('acknowledge');
+        Route::patch('/{alert}/resolver', [AlertActionController::class, 'resolve'])->middleware('can:resolve,alert')->name('resolve');
     });
 
     Route::prefix('catalogos')->name('catalogs.')->group(function () {

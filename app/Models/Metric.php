@@ -61,6 +61,14 @@ class Metric extends Model
         return $this->hasMany(AlertRule::class);
     }
 
+    /**
+     * @return HasMany<Alert, $this>
+     */
+    public function alerts(): HasMany
+    {
+        return $this->hasMany(Alert::class);
+    }
+
     public function catalogLabel(): string
     {
         return $this->name;

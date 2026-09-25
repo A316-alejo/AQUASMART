@@ -8,7 +8,7 @@
             ['route' => 'ponds.index', 'active' => 'ponds.*', 'icon' => 'pond', 'label' => 'Gestión de estanques', 'can' => ['viewAny', App\Models\Pond::class]],
             ['route' => 'batches.index', 'active' => 'batches.*', 'icon' => 'fish', 'label' => 'Lotes', 'can' => ['viewAny', App\Models\Batch::class]],
             ['route' => 'devices.index', 'active' => 'devices.*', 'icon' => 'iot', 'label' => 'Centro IoT'],
-            ['route' => 'alerts.index', 'active' => 'alerts.*', 'icon' => 'alert', 'label' => 'Centro de alertas'],
+            ['route' => 'alerts.index', 'active' => 'alerts.*', 'icon' => 'alert', 'label' => 'Centro de alertas', 'can' => ['viewAny', App\Models\Alert::class]],
         ],
         'Análisis' => [
             ['route' => 'stats', 'active' => 'stats', 'icon' => 'stats', 'label' => 'Estadísticas'],

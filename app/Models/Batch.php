@@ -108,6 +108,14 @@ class Batch extends Model
     }
 
     /**
+     * @return HasMany<Alert, $this>
+     */
+    public function alerts(): HasMany
+    {
+        return $this->hasMany(Alert::class);
+    }
+
+    /**
      * Biometría más reciente (por fecha y, a igual fecha, la última registrada).
      *
      * @return HasOne<Sampling, $this>

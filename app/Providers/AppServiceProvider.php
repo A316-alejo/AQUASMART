@@ -37,6 +37,7 @@ class AppServiceProvider extends ServiceProvider
         Route::pattern('pond', '[0-9]+');
         Route::pattern('item', '[0-9]+');
         Route::pattern('batch', '[0-9]+');
+        Route::pattern('alert', '[0-9]+');
 
         // {item} se busca únicamente en la tabla del catálogo indicado en la URL.
         Route::bind('item', function (string $value, RoutingRoute $route) {
