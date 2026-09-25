@@ -84,7 +84,7 @@ Orden oficial:
 8. Alimentación, mortalidad, biometría y biomasa ✔
 9. Calidad del agua y mediciones ✔
 10. Centro de alertas ✔
-11. Dashboard
+11. Dashboard ✔
 12. IoT, dispositivos, sensores y API
 13. Actualización periódica/tiempo real
 14. Estadísticas y reportes
