@@ -17,6 +17,7 @@ use App\Http\Controllers\FarmStatusController;
 use App\Http\Controllers\FeedingController;
 use App\Http\Controllers\MortalityController;
 use App\Http\Controllers\PondController;
+use App\Http\Controllers\PondReadingController;
 use App\Http\Controllers\PondStatusController;
 use App\Http\Controllers\ProducerController;
 use App\Http\Controllers\ProducerStatusController;
@@ -105,6 +106,7 @@ Route::middleware(['auth', 'active'])->group(function () {
 
         Route::get('/', [PondController::class, 'index'])->middleware('can:viewAny,'.Pond::class)->name('index');
         Route::get('/{pond}', [PondController::class, 'show'])->middleware('can:view,pond')->name('show');
+        Route::get('/{pond}/lecturas', [PondReadingController::class, 'latest'])->middleware('can:view,pond')->name('readings');
     });
 
     Route::prefix('lotes')->name('batches.')->group(function () {

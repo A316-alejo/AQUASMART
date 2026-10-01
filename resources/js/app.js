@@ -1,5 +1,6 @@
 import './bootstrap';
 import './charts';
+import './live-readings';
 
 document.addEventListener('click', (event) => {
     if (event.target.closest('[data-nav-toggle]')) {

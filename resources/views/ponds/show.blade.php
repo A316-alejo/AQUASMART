@@ -81,6 +81,14 @@
         </dl>
     </div>
 
+    <div class="card" style="margin-top:14px" data-live-readings data-poll-url="{{ route('ponds.readings', $pond) }}">
+        <header><h3>Calidad del agua en tiempo real</h3></header>
+        <p class="muted-line" data-live-status>Cargando lecturas…</p>
+        <div data-live-body>
+            <p class="muted-line">Cargando lecturas…</p>
+        </div>
+    </div>
+
     <div class="card" style="margin-top:14px">
         <header>
             <h3>Lotes</h3>

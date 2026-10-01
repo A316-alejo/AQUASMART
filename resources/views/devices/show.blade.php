@@ -70,15 +70,30 @@
                 <span class="tag info plain">{{ $device->sensors->count() }}</span>
             </header>
             @forelse ($device->sensors as $sensor)
+                @php
+                    $info = $readingSummaries->get($sensor->id);
+                    $reading = $info['reading'] ?? null;
+                    $status = $info['status'] ?? null;
+                @endphp
                 <div class="list-row">
                     <span class="sev info" aria-hidden="true"><x-icon name="iot" style="width:18px;height:18px" /></span>
                     <span class="body">
                         <b>{{ $sensor->code }} · {{ $sensor->name }}</b>
                         <span>
-                            {{ $sensor->metric->name }} ({{ $sensor->metric->unit }}) · estanque {{ $sensor->pond->code }}
+                            {{ $sensor->metric->name }} · estanque {{ $sensor->pond->code }}
                             {{ $sensor->is_active ? '' : '· Inactivo' }}
+                            @if ($reading)
+                                · {{ $sensor->metric->format($reading->value) }} · {{ $reading->measured_at->format('d/m/Y H:i') }}
+                            @elseif (($info['has_active_batch'] ?? false) === false)
+                                · El estanque no tiene un lote activo
+                            @else
+                                · Sin lecturas todavía
+                            @endif
                         </span>
                     </span>
+                    @if ($status)
+                        <x-quality-status :status="$status" />
+                    @endif
                     @can('update', $sensor)
                         <a class="btn sm" href="{{ route('devices.sensors.edit', [$device, $sensor]) }}">Editar</a>
                     @endcan

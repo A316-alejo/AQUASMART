@@ -130,7 +130,7 @@ class AlertGenerationTest extends TestCase
     {
         $this->actingAs($this->admin)
             ->post(route('batches.water-quality.store', $this->batch), [
-                'water_quality_date' => today()->format('Y-m-d').'T08:00',
+                'water_quality_date' => now()->format('Y-m-d\TH:i'),
                 'water_quality_metric_id' => $this->metric->id,
                 'water_quality_value' => '36',
             ])
@@ -142,7 +142,7 @@ class AlertGenerationTest extends TestCase
 
         $this->actingAs($this->admin)
             ->post(route('batches.water-quality.store', $this->batch), [
-                'water_quality_date' => today()->format('Y-m-d').'T09:00',
+                'water_quality_date' => now()->format('Y-m-d\TH:i'),
                 'water_quality_metric_id' => $this->metric->id,
                 'water_quality_value' => '25',
             ])

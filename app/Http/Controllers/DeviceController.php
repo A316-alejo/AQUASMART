@@ -7,6 +7,7 @@ use App\Http\Requests\Devices\StoreDeviceRequest;
 use App\Http\Requests\Devices\UpdateDeviceRequest;
 use App\Models\Device;
 use App\Models\Farm;
+use App\Services\SensorReadingSummary;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -76,13 +77,21 @@ class DeviceController extends Controller
             ->with('device_token', $token);
     }
 
-    public function show(Device $device): View
+    public function show(Device $device, SensorReadingSummary $summary): View
     {
         Gate::authorize('view', $device);
 
-        $device->load(['farm.producer', 'sensors' => fn ($query) => $query->with(['pond:id,code', 'metric:id,name,unit'])->orderBy('code')]);
+        $device->load([
+            'farm.producer',
+            'sensors' => fn ($query) => $query
+                ->with(['pond:id,code,farm_id', 'metric:id,code,name,unit,decimals,min_value,max_value'])
+                ->orderBy('code'),
+        ]);
 
-        return view('devices.show', ['device' => $device]);
+        return view('devices.show', [
+            'device' => $device,
+            'readingSummaries' => $summary->forSensors($device->sensors),
+        ]);
     }
 
     public function edit(Device $device): View
