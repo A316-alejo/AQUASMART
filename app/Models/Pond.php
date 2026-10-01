@@ -63,6 +63,16 @@ class Pond extends Model
         return $this->hasMany(Batch::class);
     }
 
+    /**
+     * Sensores físicos instalados en el estanque.
+     *
+     * @return HasMany<Sensor, $this>
+     */
+    public function sensors(): HasMany
+    {
+        return $this->hasMany(Sensor::class);
+    }
+
     public function isVisibleTo(User $user): bool
     {
         return static::query()->visibleTo($user)->whereKey($this->getKey())->exists();

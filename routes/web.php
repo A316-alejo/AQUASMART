@@ -8,6 +8,9 @@ use App\Http\Controllers\BatchController;
 use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\CatalogStatusController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DeviceController;
+use App\Http\Controllers\DeviceStatusController;
+use App\Http\Controllers\DeviceTokenController;
 use App\Http\Controllers\FarmAssignmentController;
 use App\Http\Controllers\FarmController;
 use App\Http\Controllers\FarmStatusController;
@@ -18,12 +21,15 @@ use App\Http\Controllers\PondStatusController;
 use App\Http\Controllers\ProducerController;
 use App\Http\Controllers\ProducerStatusController;
 use App\Http\Controllers\SamplingController;
+use App\Http\Controllers\SensorController;
+use App\Http\Controllers\SensorStatusController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserPasswordResetLinkController;
 use App\Http\Controllers\UserStatusController;
 use App\Http\Controllers\WaterQualityReadingController;
 use App\Models\Alert;
 use App\Models\Batch;
+use App\Models\Device;
 use App\Models\Farm;
 use App\Models\Pond;
 use App\Models\Producer;
@@ -124,6 +130,33 @@ Route::middleware(['auth', 'active'])->group(function () {
             Route::post('/{batch}/biometrias', [SamplingController::class, 'store'])->name('samplings.store');
             Route::post('/{batch}/calidad-agua', [WaterQualityReadingController::class, 'store'])->name('water-quality.store');
         });
+    });
+
+    Route::prefix('dispositivos')->name('devices.')->group(function () {
+        Route::middleware('can:manage-devices')->group(function () {
+            Route::get('/crear', [DeviceController::class, 'create'])->name('create');
+            Route::post('/', [DeviceController::class, 'store'])->name('store');
+            Route::get('/{device}/editar', [DeviceController::class, 'edit'])->name('edit');
+            Route::put('/{device}', [DeviceController::class, 'update'])->name('update');
+
+            Route::get('/{device}/desactivar', [DeviceStatusController::class, 'confirmDeactivation'])->name('deactivate.confirm');
+            Route::patch('/{device}/desactivar', [DeviceStatusController::class, 'deactivate'])->name('deactivate');
+            Route::patch('/{device}/activar', [DeviceStatusController::class, 'activate'])->name('activate');
+
+            Route::patch('/{device}/token', [DeviceTokenController::class, 'regenerate'])->name('token.regenerate');
+
+            Route::get('/{device}/sensores/crear', [SensorController::class, 'create'])->name('sensors.create');
+            Route::post('/{device}/sensores', [SensorController::class, 'store'])->name('sensors.store');
+            Route::get('/{device}/sensores/{sensor}/editar', [SensorController::class, 'edit'])->name('sensors.edit');
+            Route::put('/{device}/sensores/{sensor}', [SensorController::class, 'update'])->name('sensors.update');
+
+            Route::get('/{device}/sensores/{sensor}/desactivar', [SensorStatusController::class, 'confirmDeactivation'])->name('sensors.deactivate.confirm');
+            Route::patch('/{device}/sensores/{sensor}/desactivar', [SensorStatusController::class, 'deactivate'])->name('sensors.deactivate');
+            Route::patch('/{device}/sensores/{sensor}/activar', [SensorStatusController::class, 'activate'])->name('sensors.activate');
+        });
+
+        Route::get('/', [DeviceController::class, 'index'])->middleware('can:viewAny,'.Device::class)->name('index');
+        Route::get('/{device}', [DeviceController::class, 'show'])->middleware('can:view,device')->name('show');
     });
 
     Route::prefix('alertas')->name('alerts.')->group(function () {

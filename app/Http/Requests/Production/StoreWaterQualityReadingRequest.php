@@ -36,10 +36,8 @@ class StoreWaterQualityReadingRequest extends ProductionRecordRequest
                         return;
                     }
 
-                    if ($metric->min_value !== null && (float) $value < (float) $metric->min_value) {
-                        $fail('El valor está por debajo del rango físico válido de '.$metric->name.' (mínimo '.$metric->format($metric->min_value).').');
-                    } elseif ($metric->max_value !== null && (float) $value > (float) $metric->max_value) {
-                        $fail('El valor está por encima del rango físico válido de '.$metric->name.' (máximo '.$metric->format($metric->max_value).').');
+                    if ($error = $metric->physicalRangeError((float) $value)) {
+                        $fail($error);
                     }
                 },
             ],

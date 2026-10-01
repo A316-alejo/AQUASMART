@@ -69,6 +69,14 @@ class Metric extends Model
         return $this->hasMany(Alert::class);
     }
 
+    /**
+     * @return HasMany<Sensor, $this>
+     */
+    public function sensors(): HasMany
+    {
+        return $this->hasMany(Sensor::class);
+    }
+
     public function catalogLabel(): string
     {
         return $this->name;
@@ -84,5 +92,23 @@ class Metric extends Model
         }
 
         return trim(number_format((float) $value, $this->decimals, ',', '.').' '.$this->unit);
+    }
+
+    /**
+     * Mensaje de error si el valor está fuera del rango físico válido del parámetro, o null si es válido.
+     * Compartido por el formulario manual de calidad del agua y la API de ingestión de sensores:
+     * el rango físico se valida una sola vez, en un único lugar.
+     */
+    public function physicalRangeError(float $value): ?string
+    {
+        if ($this->min_value !== null && $value < (float) $this->min_value) {
+            return 'El valor está por debajo del rango físico válido de '.$this->name.' (mínimo '.$this->format($this->min_value).').';
+        }
+
+        if ($this->max_value !== null && $value > (float) $this->max_value) {
+            return 'El valor está por encima del rango físico válido de '.$this->name.' (máximo '.$this->format($this->max_value).').';
+        }
+
+        return null;
     }
 }

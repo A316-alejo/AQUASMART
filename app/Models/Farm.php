@@ -85,6 +85,14 @@ class Farm extends Model
     }
 
     /**
+     * @return HasMany<Device, $this>
+     */
+    public function devices(): HasMany
+    {
+        return $this->hasMany(Device::class);
+    }
+
+    /**
      * Personal asignado a la finca (técnicos y usuarios de consulta).
      *
      * @return BelongsToMany<User, $this>

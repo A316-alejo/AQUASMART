@@ -38,6 +38,8 @@ class AppServiceProvider extends ServiceProvider
         Route::pattern('item', '[0-9]+');
         Route::pattern('batch', '[0-9]+');
         Route::pattern('alert', '[0-9]+');
+        Route::pattern('device', '[0-9]+');
+        Route::pattern('sensor', '[0-9]+');
 
         // {item} se busca únicamente en la tabla del catálogo indicado en la URL.
         Route::bind('item', function (string $value, RoutingRoute $route) {
@@ -73,6 +75,9 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('manage-catalogs', fn (User $user) => $user->is_active && $user->isAdmin());
 
         Gate::define('manage-batches', fn (User $user) => $user->is_active && $user->isAdmin());
+
+        // Configuración estructural de IoT (dispositivos y sensores): solo administradores.
+        Gate::define('manage-devices', fn (User $user) => $user->is_active && $user->isAdmin());
 
         // Registros productivos (alimentación, mortalidad, biometría): roles operativos; consulta solo lee.
         Gate::define('record-production', fn (User $user) => $user->is_active
