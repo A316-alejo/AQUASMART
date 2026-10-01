@@ -24,6 +24,7 @@ use App\Http\Controllers\ProducerStatusController;
 use App\Http\Controllers\SamplingController;
 use App\Http\Controllers\SensorController;
 use App\Http\Controllers\SensorStatusController;
+use App\Http\Controllers\StatsController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserPasswordResetLinkController;
 use App\Http\Controllers\UserStatusController;
@@ -40,6 +41,7 @@ Route::redirect('/', '/dashboard');
 
 Route::middleware(['auth', 'active'])->group(function () {
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
+    Route::get('/estadisticas', StatsController::class)->name('stats');
 
     Route::middleware('can:manage-users')->prefix('usuarios')->name('users.')->group(function () {
         Route::get('/', [UserController::class, 'index'])->name('index');

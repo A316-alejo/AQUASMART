@@ -87,7 +87,7 @@ Orden oficial:
 11. Dashboard ✔
 12. IoT, dispositivos, sensores y API ✔
 13. Actualización periódica/tiempo real ✔
-14. Estadísticas y reportes
+14. Estadísticas y reportes ✔
 15. Asistente IA
 
 No avanzar automáticamente al siguiente paso sin autorización.
