@@ -33,8 +33,8 @@ class AccountRecoveryController extends Controller
         $email = $request->string('email')->toString();
         $user = User::where('email', $email)->first();
 
-        if ($user && $user->canAccessSystem()) {
-            $service->sendOtp($user);
+        if ($user && $user->canAccessSystem() && ! $service->sendOtp($user)) {
+            return back()->withInput()->withErrors(['email' => __('auth.recovery_send_failed')]);
         }
 
         $request->session()->put('recovery.email', $email);
@@ -77,8 +77,8 @@ class AccountRecoveryController extends Controller
 
         $user = User::where('email', $email)->first();
 
-        if ($user && $user->canAccessSystem()) {
-            app(AccountRecoveryService::class)->sendOtp($user);
+        if ($user && $user->canAccessSystem() && ! app(AccountRecoveryService::class)->sendOtp($user)) {
+            return back()->withErrors(['otp' => __('auth.recovery_send_failed')]);
         }
 
         return back()->with('status', __('auth.recovery_sent'));

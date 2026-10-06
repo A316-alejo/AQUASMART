@@ -11,6 +11,7 @@ return [
     'recovery_sent' => 'Si el correo está registrado, enviamos un código de verificación.',
     'recovery_invalid' => 'El código ingresado no es válido o ya expiró.',
     'recovery_throttle' => 'Demasiados intentos. Intenta de nuevo en :seconds segundos.',
+    'recovery_send_failed' => 'No pudimos enviar el código. Intenta más tarde.',
     'recovery_password_reset' => 'Tu contraseña fue restablecida. Ya puedes iniciar sesión.',
 
 ];
