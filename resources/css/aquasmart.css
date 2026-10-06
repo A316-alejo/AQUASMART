@@ -345,17 +345,6 @@ a.chip:hover{border-color:var(--aqua);color:var(--aqua)}
 a.chip[aria-current="page"]{background:var(--aqua);border-color:var(--aqua);color:#fff;font-weight:600}
 .chip .count{font-size:11.5px;opacity:.75}
 
-/* ---------- Recuperación de cuenta: selector de método (OTP/código/archivo) ---------- */
-.method-tabs__radio{position:absolute;opacity:0;pointer-events:none}
-.method-tabs__nav{flex-wrap:wrap}
-.method-tabs__nav label.chip{cursor:pointer;margin:0}
-.method-tabs__panel{display:none}
-#m-otp:checked ~ .method-tabs__panel[data-panel="otp"],
-#m-code:checked ~ .method-tabs__panel[data-panel="code"],
-#m-file:checked ~ .method-tabs__panel[data-panel="file"]{display:block}
-#m-otp:checked ~ .method-tabs__nav label[for="m-otp"],
-#m-code:checked ~ .method-tabs__nav label[for="m-code"],
-#m-file:checked ~ .method-tabs__nav label[for="m-file"]{background:var(--aqua);border-color:var(--aqua);color:#fff;font-weight:600}
 .sub-line{display:block;font-size:12.5px;color:var(--ink-3)}
 code.key{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12px;color:var(--ink-3)}
 

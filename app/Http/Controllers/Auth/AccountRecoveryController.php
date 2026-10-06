@@ -4,8 +4,6 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\RequestAccountRecoveryRequest;
-use App\Http\Requests\Auth\VerifyRecoveryCodeRequest;
-use App\Http\Requests\Auth\VerifyRecoveryFileRequest;
 use App\Http\Requests\Auth\VerifyRecoveryOtpRequest;
 use App\Models\User;
 use App\Services\AccountRecoveryService;
@@ -16,7 +14,7 @@ use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 /**
- * Recuperación de cuenta sin contraseña: correo → OTP/recovery code/archivo → nueva contraseña.
+ * Recuperación de cuenta sin contraseña: correo → OTP enviado por correo → nueva contraseña.
  * Nunca revela si un correo está registrado ni confía en IDs enviados por el cliente: la cuenta
  * que se está recuperando vive únicamente en la sesión del servidor (session('recovery.*')).
  */
@@ -103,51 +101,6 @@ class AccountRecoveryController extends Controller
         }
 
         return back()->withErrors(['otp' => __('auth.recovery_invalid')]);
-    }
-
-    public function verifyCode(VerifyRecoveryCodeRequest $request, AccountRecoveryService $service): RedirectResponse
-    {
-        $email = $request->session()->get('recovery.email');
-
-        if (! $email) {
-            return redirect()->route('recovery.request');
-        }
-
-        $request->ensureIsNotRateLimited($email);
-        $request->hit($email);
-
-        $user = User::where('email', $email)->first();
-
-        if ($user && $user->canAccessSystem() && $service->verifyRecoveryCode($user, $request->string('code')->toString())) {
-            $this->grantRecoveryAccess($request, $user);
-
-            return redirect()->route('recovery.password.edit');
-        }
-
-        return back()->withErrors(['code' => __('auth.recovery_invalid')]);
-    }
-
-    public function verifyFile(VerifyRecoveryFileRequest $request, AccountRecoveryService $service): RedirectResponse
-    {
-        $email = $request->session()->get('recovery.email');
-
-        if (! $email) {
-            return redirect()->route('recovery.request');
-        }
-
-        $request->ensureIsNotRateLimited($email);
-        $request->hit($email);
-
-        $user = User::where('email', $email)->first();
-        $token = trim($request->file('recovery_file')->get());
-
-        if ($user && $user->canAccessSystem() && $service->verifyRecoveryFile($user, $token)) {
-            $this->grantRecoveryAccess($request, $user);
-
-            return redirect()->route('recovery.password.edit');
-        }
-
-        return back()->withErrors(['recovery_file' => __('auth.recovery_invalid')]);
     }
 
     private function grantRecoveryAccess(Request $request, User $user): void

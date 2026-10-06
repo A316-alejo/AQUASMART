@@ -1,7 +1,6 @@
 <?php
 
 use App\Enums\Catalog;
-use App\Http\Controllers\Auth\AccountRecoverySetupController;
 use App\Http\Controllers\AlertActionController;
 use App\Http\Controllers\AlertController;
 use App\Http\Controllers\BatchClosureController;
@@ -43,12 +42,6 @@ Route::redirect('/', '/dashboard');
 Route::middleware(['auth', 'active'])->group(function () {
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
     Route::get('/estadisticas', StatsController::class)->name('stats');
-
-    Route::prefix('seguridad')->name('security.')->group(function () {
-        Route::get('/recuperacion', [AccountRecoverySetupController::class, 'show'])->name('recovery.show');
-        Route::post('/recuperacion/codigos', [AccountRecoverySetupController::class, 'generateCodes'])->name('recovery.codes.generate');
-        Route::post('/recuperacion/archivo', [AccountRecoverySetupController::class, 'generateFile'])->name('recovery.file.generate');
-    });
 
     Route::middleware('can:manage-users')->prefix('usuarios')->name('users.')->group(function () {
         Route::get('/', [UserController::class, 'index'])->name('index');

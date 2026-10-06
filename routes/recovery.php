@@ -18,12 +18,6 @@ Route::middleware('guest')->prefix('recuperar-cuenta')->name('recovery.')->group
     Route::post('/verificar/otp', [AccountRecoveryController::class, 'verifyOtp'])
         ->middleware('throttle:10,1')
         ->name('otp.verify');
-    Route::post('/verificar/codigo', [AccountRecoveryController::class, 'verifyCode'])
-        ->middleware('throttle:10,1')
-        ->name('code.verify');
-    Route::post('/verificar/archivo', [AccountRecoveryController::class, 'verifyFile'])
-        ->middleware('throttle:10,1')
-        ->name('file.verify');
 
     Route::get('/nueva-contrasena', [NewPasswordAfterRecoveryController::class, 'edit'])->name('password.edit');
     Route::post('/nueva-contrasena', [NewPasswordAfterRecoveryController::class, 'update'])

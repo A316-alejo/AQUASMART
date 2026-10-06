@@ -12,6 +12,5 @@ return [
     'recovery_invalid' => 'El código ingresado no es válido o ya expiró.',
     'recovery_throttle' => 'Demasiados intentos. Intenta de nuevo en :seconds segundos.',
     'recovery_password_reset' => 'Tu contraseña fue restablecida. Ya puedes iniciar sesión.',
-    'recovery_codes_generated' => 'Generamos un set nuevo de recovery codes.',
 
 ];
