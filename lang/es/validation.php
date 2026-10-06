@@ -177,6 +177,9 @@ return [
         'producer_id' => 'productor asociado',
         'remember' => 'recordarme',
         'token' => 'token',
+        'otp' => 'código de verificación',
+        'code' => 'código de recuperación',
+        'recovery_file' => 'archivo de recuperación',
     ],
 
 ];

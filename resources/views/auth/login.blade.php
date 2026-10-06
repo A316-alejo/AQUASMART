@@ -31,7 +31,7 @@
                 <input type="checkbox" name="remember" value="1" @checked(old('remember'))>
                 Recordarme
             </label>
-            <a class="link" href="{{ route('password.request') }}">¿Olvidaste tu contraseña?</a>
+            <a class="link" href="{{ route('recovery.request') }}">¿Olvidaste tu contraseña?</a>
         </div>
 
         <button type="submit" class="btn primary block">Ingresar</button>
