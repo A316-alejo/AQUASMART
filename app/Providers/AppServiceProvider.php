@@ -4,15 +4,19 @@ namespace App\Providers;
 
 use App\Enums\Catalog;
 use App\Enums\Role;
+use App\Mail\Transport\RedactedLogTransport;
 use App\Models\User;
 use App\Policies\CatalogPolicy;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Log\LogManager;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Routing\Route as RoutingRoute;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
+use Psr\Log\LoggerInterface;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -27,6 +31,20 @@ class AppServiceProvider extends ServiceProvider
         Model::shouldBeStrict(! $this->app->isProduction());
 
         Password::defaults(fn () => Password::min(8)->letters()->numbers());
+
+        // El driver de correo "log" (MAIL_MAILER=log, el de desarrollo) escribe el correo completo
+        // en el log de la aplicación. Se sustituye por una versión que solo registra encabezados no
+        // sensibles, para que un OTP, un enlace de restablecimiento u otro secreto nunca quede en
+        // storage/logs. No afecta a un transporte real (SMTP/API) una vez configurado.
+        Mail::extend('log', function (array $config) {
+            $logger = $this->app->make(LoggerInterface::class);
+
+            if ($logger instanceof LogManager) {
+                $logger = $logger->channel($config['channel'] ?? $this->app['config']->get('mail.log_channel'));
+            }
+
+            return new RedactedLogTransport($logger);
+        });
 
         Paginator::defaultView('partials.pagination');
         Paginator::defaultSimpleView('partials.pagination');
