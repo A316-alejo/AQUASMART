@@ -19,6 +19,11 @@ class EnsureUserIsActive
         if ($user && ! $user->canAccessSystem()) {
             $message = __($user->is_active ? 'auth.producer_inactive' : 'auth.inactive');
 
+            // Peticiones de la API (token): no hay sesión que cerrar ni pantalla de login a la que volver.
+            if ($request->is('api/*') || $request->expectsJson()) {
+                return response()->json(['message' => $message], 403);
+            }
+
             Auth::guard('web')->logout();
 
             $request->session()->invalidate();

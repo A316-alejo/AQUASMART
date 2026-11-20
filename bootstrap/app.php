@@ -19,5 +19,8 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        // Una API responde siempre JSON: sin token es 401 con mensaje, no una redirección a /login.
+        $exceptions->shouldRenderJsonWhen(
+            fn (\Illuminate\Http\Request $request) => $request->is('api/*') || $request->expectsJson(),
+        );
     })->create();
