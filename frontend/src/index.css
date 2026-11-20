@@ -1,0 +1,20 @@
+* { box-sizing: border-box; }
+body { margin: 0; font: 16px/1.5 system-ui, sans-serif; color: #000; background: #fff; }
+main { max-width: 900px; margin: 0 auto; padding: 16px; }
+h1 { font-size: 1.5rem; margin: 0 0 12px; }
+.topbar { display: flex; align-items: center; gap: 16px; padding: 12px 16px; border-bottom: 1px solid #000; }
+.topbar nav { display: flex; gap: 16px; flex: 1; }
+.muted { color: #555; }
+.error { color: #000; font-weight: bold; }
+.form { max-width: 400px; display: grid; gap: 12px; }
+label { display: grid; gap: 4px; }
+label.check { display: flex; gap: 8px; align-items: center; }
+input, select, .btn { font: inherit; padding: 6px 8px; border: 1px solid #000; background: #fff; color: #000; }
+.btn { cursor: pointer; }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+.row, .filters, .pager { display: flex; gap: 8px; align-items: center; margin: 8px 0; }
+table { width: 100%; border-collapse: collapse; }
+th, td { padding: 6px 8px; text-align: left; border: 1px solid #000; }
+.actions { display: flex; gap: 8px; align-items: center; }
+.tag { text-decoration: underline; }
+@media (max-width: 700px) { table { display: block; overflow-x: auto; } }
